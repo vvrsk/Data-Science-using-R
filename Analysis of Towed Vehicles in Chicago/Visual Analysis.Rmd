@@ -1,0 +1,175 @@
+---
+title: "Analysis Towed Vehicels of Cty of Chicago"
+author: "Sai Karthik Varanasi"
+date: "March 10, 2017"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Statement
+
+The following visual analysis is a visual depiction of the Towed Vehicles data in City of Chicago. This can be used as a pre analysis of finding the make of most towed vehicles and their color and where they have been towed to (Auto Pounds).
+
+##Data
+
+The data for this can be found at the [City of Chicago's Website](https://data.cityofchicago.org/Transportation/Towed-Vehicles/ygr5-vcbg)
+For this analysis I considered the data for the last 4 months (Dec 2016 - Feb 2017) and can be seen in the Data Table Tab of the Graph.
+
+
+##About the Graphs 
+ 
+ -This is an analyis of how Towed Vechicles are stacked in the 4 different Auto Pounds of **City of Chicago**.
+ -The **Make Anlaysis** gives the distribution of cars based on their Make and Color across these Auto Pounds.
+ -The **Auto Pounds Aggregate** gives the Aggregate analysis of Auto ponds and the **Location Analysis** gives the distribution of different vechicles  available in each Auto Pound.
+ 
+ 
+## Navigating in the Graph
+
+ The graphs are set in different panels and you can navigate to different panels by clicking on the respective panel.
+ 
+###Make Analysis
+
+In the Make Analysis, the user has the option of selecting the Type of the Vehicle and the Location of the City to find the distribution of the color of the  cars availabe in the in the respective Auto Pound.
+
+###Location Analysis
+
+The Location Analysis shows the distribution of different vehicles in the Auto Pound for the 4 different Autopounds of City of Chicago.
+
+
+###Auto Pounds Aggregate
+In the Auto Pounds Aggregate, the number of vehicles in the each pound are aggregated in to a histogram.
+
+###Data Table
+This has all the data that is used for the analysis. This has an option of sorting and the number of records that can be seen can be changed by using the number of records drop down from the top of the table.
+
+
+##Code
+
+Loading the data:
+
+```{r}
+library(readr)
+towed_vehicles <- read_csv("C:/Users/vvrsk/Desktop/Coursera/Course 9/Towed_Vehicles.csv", 
+    col_types = cols(Model = col_skip(), 
+        Plate = col_skip(), State = col_skip(), 
+        Style = col_skip(), `Tow Facility Phone` = col_skip()))
+
+```
+
+
+
+The code of the UI (ui.r)is shown below,
+
+
+ *Loading the required Libraries
+```{r }
+library(shiny)
+library(plotly)
+```
+
+ *Code for populating the dropdown inthe Make Analysis tab.
+```{r}
+make <- unique(sort(towed_vehicles$Make))
+color<- unique(sort(towed_vehicles$Color))
+tow_to <-unique(sort(towed_vehicles$`Towed to Address`))
+```
+
+ *The UI page where the magic happens where the different inputs for the panels for the tabs are created.
+```{r}
+shinyUI(fluidPage( 
+        headerPanel("Towed Vehicles Visualizer"),  
+        #sidebarPanel(
+        #        h3("Control Subpanel"), 
+        #        selectInput("type", "Select Type of vehicle", choices = make, selected=name[1]),
+        #        selectInput("color", "Select color code", choices = tow_to, selected=name[2])
+        #        ),  
+        mainPanel(
+                
+                tabsetPanel(
+                tabPanel("Summmary",htmlOutput("summary")),
+                tabPanel("Make analysis",h3(textOutput("add")),
+                            selectInput("type", "Select Type of vehicle", choices = make, selected=name[1]),
+                            selectInput("color", "Select color code", choices = tow_to, selected=name[2]),
+                            plotlyOutput('myChart',height = "470px")
+                         ),
+                tabPanel("Location Analysis",plotlyOutput('location_chart',height = "550px")),
+                tabPanel("Auto Pounds Aggregate",plotlyOutput('location_chart_aggr',height = "550px")),
+                tabPanel("Data Table", dataTableOutput("table"))
+        ))
+))
+
+```
+
+
+
+The code for the server.R which executes on the server is shown below.
+
+ *Loading the required Libraries
+```{r }
+library(shiny)
+library(plotly)
+```
+
+
+ *This is the place where the coode for the calulations for he UI page is written.
+ *For the summary page the code is written with in the tags of HTML so that the output is rendered as a HTML text than just a text input.
+ *Hence the output is also catched with a HTMLOUTPUT tag in the ui.R code which is mentioned above.
+```{r}
+shinyServer(
+        function(input, output) {  
+                
+               dataset <- reactive({df<- (towed_vehicles[towed_vehicles$Make == input$type & towed_vehicles$`Towed to Address` == input$color, ])})
+                output$add <- renderText({paste("Make of Car is:", input$type)})
+                #output$Controls <- renderUI({list(selectInput("type", "Select Type of vehicle", make, selected=name[1]),
+                #                                 selectInput("color", "Select color code", color, selected=name[2])
+                #                                )
+                #        })
+             
+        output$myChart <- renderPlotly({
+                
+                p <- plot_ly(dataset(), x = ~Make, type = "histogram", color = ~Color)
+                
+        }) 
+        output$location_chart <- renderPlotly({
+                
+                p <- plot_ly(towed_vehicles, x = ~`Towed to Address`, type = "histogram", color = ~Make)
+                
+        })
+        
+        output$location_chart_aggr <- renderPlotly({
+                
+                p <- plot_ly(towed_vehicles, x = ~`Towed to Address`, type = "histogram",  text = ~paste('Make of Cars: ', Make))
+                
+        })
+        
+        output$table <- renderDataTable(towed_vehicles)
+        
+        
+        txt <- "<br/> <font size='4'>Hello, Thanks for Coming here!! <br/> </font size>
+                <ul>
+                <li>This is an analyis of how Towed Vechicles are stacked in the 4 different Auto Pounds of <b>City of Chicago</b>. </li>
+                <li>For this analysis I considered the data for the last 4 months (Dec 2016 - Feb 2017) and can be seen in the <b>Data Table</b> Tab of the Graph.</li> 
+                <li>The <b>Make Anlaysis</b> gives the distribution of cars based on their Make and Color across these Auto Pounds.</li>
+                <li>The <b>Auto Pounds Aggregate</b> gives the Aggrate analysis of Auto ponds and the <b>Location Analysis</b> gives the distribution of different vechicles available in each Auto Pound.</li>
+                </ul>"
+        
+        output$summary <- renderUI({ 
+               HTML(paste(txt))
+        })
+   }) 
+
+```
+
+
+ 
+##Observations
+
+From the graphs, we can observe many things, but these are the key observations made my me.
+ -Most of the Vehicles ar econcentrated in just two of the 4 available Auto Pounds
+ -The reason for the concentration of the cars being more in the other two ponds could be many.
+ -The reson why the two pounds have lower concentration is because they are both fundamentally smaller than the other two and one of them is in Down Town of Chicago and other is near O'Hare Airport(1 hr drive from Down Town) both of which are not great locations for holding th etowed vehicles for security and logistic purposes.
+ -This analysis can be used to find if there is any relation between the Car and its color on the locaction where it is held and to find out the most number of vehicles that are held ina  Auto Pound
