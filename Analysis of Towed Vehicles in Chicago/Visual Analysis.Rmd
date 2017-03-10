@@ -1,5 +1,5 @@
 ---
-title: "Analysis Towed Vehicels of Cty of Chicago"
+title: "Analysis of Towed Vehicels the Cty of Chicago"
 author: "Sai Karthik Varanasi"
 date: "March 10, 2017"
 output: html_document
@@ -22,9 +22,9 @@ For this analysis I considered the data for the last 4 months (Dec 2016 - Feb 20
 
 ##About the Graphs 
  
- -This is an analyis of how Towed Vechicles are stacked in the 4 different Auto Pounds of **City of Chicago**.
- -The **Make Anlaysis** gives the distribution of cars based on their Make and Color across these Auto Pounds.
- -The **Auto Pounds Aggregate** gives the Aggregate analysis of Auto ponds and the **Location Analysis** gives the distribution of different vechicles  available in each Auto Pound.
+-This is an analyis of how Towed Vechicles are stacked in the 4 different Auto Pounds of **City of Chicago**.
+-The **Make Anlaysis** gives the distribution of cars based on their Make and Color across these Auto Pounds.
+-The **Auto Pounds Aggregate** gives the Aggregate analysis of Auto ponds and the **Location Analysis** gives the distribution of different vechicles  available in each Auto Pound.
  
  
 ## Navigating in the Graph
@@ -65,20 +65,20 @@ towed_vehicles <- read_csv("C:/Users/vvrsk/Desktop/Coursera/Course 9/Towed_Vehic
 The code of the UI (ui.r)is shown below,
 
 
- *Loading the required Libraries
+*Loading the required Libraries
 ```{r }
 library(shiny)
 library(plotly)
 ```
 
- *Code for populating the dropdown inthe Make Analysis tab.
+*Code for populating the dropdown inthe Make Analysis tab.
 ```{r}
 make <- unique(sort(towed_vehicles$Make))
 color<- unique(sort(towed_vehicles$Color))
 tow_to <-unique(sort(towed_vehicles$`Towed to Address`))
 ```
 
- *The UI page where the magic happens where the different inputs for the panels for the tabs are created.
+*The UI page where the magic happens where the different inputs for the panels for the tabs are created.
 ```{r}
 shinyUI(fluidPage( 
         headerPanel("Towed Vehicles Visualizer"),  
@@ -115,9 +115,9 @@ library(plotly)
 ```
 
 
- *This is the place where the coode for the calulations for he UI page is written.
- *For the summary page the code is written with in the tags of HTML so that the output is rendered as a HTML text than just a text input.
- *Hence the output is also catched with a HTMLOUTPUT tag in the ui.R code which is mentioned above.
+*This is the place where the coode for the calulations for he UI page is written.
+*For the summary page the code is written with in the tags of HTML so that the output is rendered as a HTML text than just a text input.
+*Hence the output is also catched with a HTMLOUTPUT tag in the ui.R code which is mentioned above.
 ```{r}
 shinyServer(
         function(input, output) {  
@@ -169,7 +169,7 @@ shinyServer(
 ##Observations
 
 From the graphs, we can observe many things, but these are the key observations made my me.
- -Most of the Vehicles ar econcentrated in just two of the 4 available Auto Pounds
- -The reason for the concentration of the cars being more in the other two ponds could be many.
- -The reson why the two pounds have lower concentration is because they are both fundamentally smaller than the other two and one of them is in Down Town of Chicago and other is near O'Hare Airport(1 hr drive from Down Town) both of which are not great locations for holding th etowed vehicles for security and logistic purposes.
- -This analysis can be used to find if there is any relation between the Car and its color on the locaction where it is held and to find out the most number of vehicles that are held ina  Auto Pound
+-Most of the Vehicles ar econcentrated in just two of the 4 available Auto Pounds
+-The reason for the concentration of the cars being more in the other two ponds could be many.
+-The reson why the two pounds have lower concentration is because they are both fundamentally smaller than the other two and one of them is in Down Town of Chicago and other is near O'Hare Airport(1 hr drive from Down Town) both of which are not great locations for holding th etowed vehicles for security and logistic purposes.
+-This analysis can be used to find if there is any relation between the Car and its color on the locaction where it is held and to find out the most number of vehicles that are held ina  Auto Pound
